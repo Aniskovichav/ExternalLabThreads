@@ -1,76 +1,83 @@
 package by.itstep.aniskovich.java.externallabthreads.port.model.logic;
 
-import by.itstep.aniskovich.java.externallabthreads.port.model.entity.Dock;
 import by.itstep.aniskovich.java.externallabthreads.port.view.PortLogger;
 
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Port {
     private final int capacity;
     private int currentContainers;
-    private final Dock[] docks;
-    private final Lock lock = new ReentrantLock();
-    private final Condition notFull = lock.newCondition();
-    private final Condition notEmpty = lock.newCondition();
-    
+    private final boolean[] docks;
+    private final Lock lock;
+
+    {
+        lock = new ReentrantLock();
+    }
+
     public Port(int capacity, int dockCount) {
         this.capacity = capacity;
         this.currentContainers = 0;
-        this.docks = new Dock[dockCount];
-        for (int i = 0; i < dockCount; i++) {
-            docks[i] = new Dock();
-        }
+        this.docks = new boolean[dockCount];
     }
-    
-    public boolean loadContainer(int count) throws InterruptedException {
+
+    public Lock getLock() {
+        return lock;
+    }
+
+    public boolean loadContainer(int count) {
         lock.lock();
         try {
-            while (currentContainers + count > capacity) {
-                notFull.await();
+            if (currentContainers + count > capacity) {
+                return false;
             }
             currentContainers += count;
             PortLogger.log("Loaded " + count + " containers. " +
                     "Current containers: " + currentContainers);
-            notEmpty.signalAll();
             return true;
         } finally {
             lock.unlock();
         }
     }
 
-    public boolean unloadContainer(int count) throws InterruptedException {
+    public boolean unloadContainer(int count) {
         lock.lock();
         try {
-            while (currentContainers < count) {
-                notFull.await();
+            if (currentContainers < count) {
+                return false;
             }
             currentContainers -= count;
             PortLogger.log("Unloaded " + count + " containers. " +
                     "Current containers: " + currentContainers);
-            notFull.signalAll();
             return true;
         } finally {
             lock.unlock();
         }
     }
 
-    public Dock requestDock() thows InterruptedException {
+    public int requestDock() {
         lock.lock();
         try {
-            for (Dock dock : docks) {
-                if (dock.tryLock()) {
-                    return dock;
+            for (int i = 0; i < docks.length; i++) {
+                if (!docks[i]) {
+                    docks[i] = true;
+                    return i;
                 }
             }
-            return null;
+            return -1;
         } finally {
             lock.unlock();
         }
     }
 
-    public void releaseDock(Dock dock) {
+    public void releaseDock(int dockIndex) {
+        lock.lock();
+        try {
+            if (dockIndex >= 0 && dockIndex < docks.length) {
+                docks[dockIndex] = false;
+            }
+        } finally {
             lock.unlock();
+        }
     }
 }
