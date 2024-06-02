@@ -16,13 +16,13 @@ public class Ship implements Runnable {
         this.capacity = capacity;
         this.containerCount = containerCount;
         this.thread.start();
-//        this.thread.join();
     }
 
     @Override
     public void run() {
+        boolean isRunning = true;
         PortLogger.log("Ship " + id + " started.");
-        while (true) {
+        while (isRunning) {
             if (port.getLock().tryLock()) {
                 try {
                     int dockIndex = -1;
@@ -50,7 +50,27 @@ public class Ship implements Runnable {
                 } finally {
                     port.getLock().unlock();
                 }
+            } else {
+                Ship waitingShip = port.getWaitingShip();
+                if (waitingShip != null) {
+                    PortLogger.log("Ship " + id + " is waiting for ship " + waitingShip.id);
+                    exchangeShips(waitingShip);
+                } else {
+                    port.addWaitingShip(this);
+                }
             }
+        }
+    }
+
+    private void exchangeShips(Ship other) {
+        if (this.containerCount > 0) {
+            other.containerCount += this.containerCount;
+            PortLogger.log("Exchanged " + this.containerCount + " containers from ship " + this.id + " to ship " + other.id);
+            this.containerCount = 0;
+        } else {
+            this.containerCount += other.containerCount;
+            PortLogger.log("Exchanged " + other.containerCount + " containers from ship " + other.id + " to ship " + this.id);
+            other.containerCount = 0;
         }
     }
 }

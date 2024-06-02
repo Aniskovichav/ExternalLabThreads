@@ -9,6 +9,5 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="JUnit" level="project" />
-    <orderEntry type="library" name="log4j-1.2.17" level="project" />
   </component>
 </module>

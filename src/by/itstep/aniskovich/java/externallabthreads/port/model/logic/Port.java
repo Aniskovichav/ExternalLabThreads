@@ -2,6 +2,7 @@ package by.itstep.aniskovich.java.externallabthreads.port.model.logic;
 
 import by.itstep.aniskovich.java.externallabthreads.port.view.PortLogger;
 
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -10,9 +11,11 @@ public class Port {
     private int currentContainers;
     private final boolean[] docks;
     private final Lock lock;
+    private final LinkedBlockingQueue<Ship> waitingShips;
 
     {
         lock = new ReentrantLock();
+        waitingShips = new LinkedBlockingQueue<>();
     }
 
     public Port(int capacity, int dockCount) {
@@ -79,5 +82,13 @@ public class Port {
         } finally {
             lock.unlock();
         }
+    }
+
+    public void addWaitingShip(Ship ship) {
+        waitingShips.offer(ship);
+    }
+
+    public Ship getWaitingShip() {
+        return waitingShips.poll();
     }
 }
