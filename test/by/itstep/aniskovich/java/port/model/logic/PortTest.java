@@ -16,17 +16,17 @@ public class PortTest {
 
     @Test
     public void testLoadContainers() {
-        assertTrue(port.loadContainer(50));
-        assertTrue(port.loadContainer(50));
-        assertFalse(port.loadContainer(1));
+        assertTrue(port.loadContainerInStorage(50));
+        assertTrue(port.loadContainerInStorage(50));
+        assertFalse(port.loadContainerInStorage(1));
     }
 
     @Test
     public void testUnloadContainers() {
-        port.loadContainer(100);
-        assertTrue(port.unloadContainer(50));
-        assertTrue(port.unloadContainer(50));
-        assertFalse(port.unloadContainer(1));
+        port.loadContainerInStorage(100);
+        assertTrue(port.unloadContainerFromStorage(50));
+        assertTrue(port.unloadContainerFromStorage(50));
+        assertFalse(port.unloadContainerFromStorage(1));
     }
 
     @Test

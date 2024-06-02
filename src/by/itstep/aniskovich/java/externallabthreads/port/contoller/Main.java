@@ -6,7 +6,7 @@ import by.itstep.aniskovich.java.externallabthreads.port.view.PortLogger;
 
 public class Main {
     public static void main(String[] args) {
-        Port port = new Port(500,2);
+        Port port = new Port(100,2);
 
         Ship ship1 = new Ship(1, port,50, 10);
         Ship ship2 = new Ship(2, port,50, 50);

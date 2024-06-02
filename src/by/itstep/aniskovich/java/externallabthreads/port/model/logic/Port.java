@@ -2,93 +2,97 @@ package by.itstep.aniskovich.java.externallabthreads.port.model.logic;
 
 import by.itstep.aniskovich.java.externallabthreads.port.view.PortLogger;
 
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Port {
-    private final int capacity;
+    private final int capacityStorage;
     private int currentContainers;
-    private final boolean[] docks;
-    private final Lock lock;
-    private final LinkedBlockingQueue<Ship> waitingShips;
+    private final Dock[] docks;
+    private final Lock containerLock;
+//    private final LinkedBlockingQueue<Ship> waitingShips;
 
     {
-        lock = new ReentrantLock();
-        waitingShips = new LinkedBlockingQueue<>();
+        containerLock = new ReentrantLock();
+//        waitingShips = new LinkedBlockingQueue<>();
     }
 
-    public Port(int capacity, int dockCount) {
-        this.capacity = capacity;
+    public Port(int capacityStorage, int dockCount) {
+        this.capacityStorage = capacityStorage;
         this.currentContainers = 0;
-        this.docks = new boolean[dockCount];
-    }
-
-    public Lock getLock() {
-        return lock;
-    }
-
-    public boolean loadContainer(int count) {
-        lock.lock();
-        try {
-            if (currentContainers + count > capacity) {
-                return false;
-            }
-            currentContainers += count;
-            PortLogger.log("Loaded " + count + " containers. " +
-                    "Current containers: " + currentContainers);
-            return true;
-        } finally {
-            lock.unlock();
+        this.docks = new Dock[dockCount];
+        for (int i = 0; i < dockCount; i++) {
+            docks[i] = new Dock();
         }
     }
 
-    public boolean unloadContainer(int count) {
-        lock.lock();
+    public Lock getLock() {
+        return containerLock;
+    }
+
+    public boolean loadContainerInStorage(int count) {
+        containerLock.lock();
         try {
-            if (currentContainers < count) {
+            while (currentContainers + count > capacityStorage) {
                 return false;
             }
-            currentContainers -= count;
-            PortLogger.log("Unloaded " + count + " containers. " +
+            currentContainers += count;
+            PortLogger.log("Loaded in storage " + count + " containers. " +
                     "Current containers: " + currentContainers);
             return true;
         } finally {
-            lock.unlock();
+            containerLock.unlock();
+        }
+    }
+
+    public boolean unloadContainerFromStorage(int count) {
+        containerLock.lock();
+        try {
+            while (currentContainers < count) {
+                return false;
+            }
+            currentContainers -= count;
+            PortLogger.log("Unloaded from storage" + count + " containers. " +
+                    "Current containers: " + currentContainers);
+            return true;
+        } finally {
+            containerLock.unlock();
         }
     }
 
     public int requestDock() {
-        lock.lock();
-        try {
-            for (int i = 0; i < docks.length; i++) {
-                if (!docks[i]) {
-                    docks[i] = true;
-                    return i;
-                }
+        for (int i = 0; i < docks.length; i++) {
+            if (docks[i].lock.tryLock()) {
+                docks[i].occupied = true;
+                return i;
             }
-            return -1;
-        } finally {
-            lock.unlock();
         }
+        return -1;
     }
 
     public void releaseDock(int dockIndex) {
-        lock.lock();
-        try {
-            if (dockIndex >= 0 && dockIndex < docks.length) {
-                docks[dockIndex] = false;
-            }
-        } finally {
-            lock.unlock();
-        }
+        docks[dockIndex].occupied = false;
+        docks[dockIndex].lock.unlock();
     }
 
-    public void addWaitingShip(Ship ship) {
-        waitingShips.offer(ship);
+//    public void addWaitingShip(Ship ship) {
+//        waitingShips.offer(ship);
+//    }
+//
+//    public Ship getWaitingShip() {
+//        return waitingShips.poll();
+//    }
+
+    public int getCapacityStorage() {
+        return capacityStorage;
     }
 
-    public Ship getWaitingShip() {
-        return waitingShips.poll();
+    public int getCurrentContainerCount() {
+        return currentContainers;
+    }
+
+    private static class Dock {
+        final Lock lock =  new ReentrantLock();
+        boolean occupied = false;
     }
 }
