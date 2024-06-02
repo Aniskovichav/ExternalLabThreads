@@ -11,7 +11,7 @@ public class PortTest {
 
     @Before
     public void setUp() {
-        port = new Port(100, 2);
+        port = new Port(100, 3);
     }
 
     @Test
@@ -40,14 +40,17 @@ public class PortTest {
     public void testMultipleDocks() {
         int dockIndex1 = port.requestDock();
         int dockIndex2 = port.requestDock();
+        int dockIndex3 = port.requestDock();
 
         assertTrue(dockIndex1 >= 0);
         assertTrue(dockIndex2 >= 0);
-        assertEquals(-1, port.requestDock()); // Проверяем, что больше нет доступных доков
+        assertTrue(dockIndex3 >= 0);
+        assertEquals(-1, port.requestDock());
 
         port.releaseDock(dockIndex1);
         port.releaseDock(dockIndex2);
+        port.releaseDock(dockIndex3);
 
-        assertTrue(port.requestDock() >= 0); // Проверяем, что док снова доступен
+        assertTrue(port.requestDock() >= 0);
     }
 }
