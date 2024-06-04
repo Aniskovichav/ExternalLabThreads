@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
         Port port = new Port(100,2);
 
-        for (int i = 1; i <= 2000; i++) {
+        for (int i = 1; i <= 200; i++) {
             new Ship(i, port, ShipInit.randomShipCapacity(), ShipInit.randomShipContainer());
         }
 

@@ -20,9 +20,8 @@ public class Ship implements Runnable {
 
     @Override
     public void run() {
-        boolean isRunning = true;
         PortLogger.log("Ship " + id + " started with " + containerCount + " containers.");
-        while (isRunning) {
+        while (true) { //
             int remainingSpaceStoragePort = port.getCapacityStorage() - port.getCurrentContainerCount();
             int dockIndex = port.requestDock();
             if (dockIndex >= 0 && remainingSpaceStoragePort > 0) {
@@ -42,7 +41,7 @@ public class Ship implements Runnable {
                         PortLogger.log("Ship " + id + " with " + containerCount + " containers.");
                     }
                     try {
-                        TimeUnit.SECONDS.sleep(10);
+                        TimeUnit.MILLISECONDS.sleep(100);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }

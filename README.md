@@ -20,9 +20,10 @@ This project simulates a port where ships dock to load and unload containers. Th
 - **Developer:** Aniskovich Artem
 - **Group:** J1023c
 - **Date:** 02.06.2024
+- **Updated:** 04.06.2024
 
 ## Features
-- Multi-threaded simulation of ships docking at a port.
+- Multithreaded simulation of ships docking at a port.
 - Ships can load and unload containers at docks.
 - Ships can exchange containers with each other when all docks are occupied.
 - Use of Java concurrency utilities (`java.util.concurrent.locks`) to manage synchronization.
@@ -46,6 +47,10 @@ This project simulates a port where ships dock to load and unload containers. Th
 ### `PortLogger`
 - Utility class for logging messages and errors using Log4j.
 
+## UML Diagram
+
+![UML Diagram](D:\16%20Анискович\Java\ExternalLabThreads.png "Seaport")
+
 ## Log4j Configuration
 The logging configuration is specified in the `log4j.properties` file. Logs are output to a file named `test.log`.
 
@@ -56,7 +61,7 @@ log4j.rootLogger=DEBUG, file
 
 # File appender configuration
 log4j.appender.file=org.apache.log4j.FileAppender
-log4j.appender.file.File=logs/test.log
+log4j.appender.file.File=logs/port.log
 log4j.appender.file.Append=true
 log4j.appender.file.layout=org.apache.log4j.PatternLayout
 log4j.appender.file.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c - %m%n
