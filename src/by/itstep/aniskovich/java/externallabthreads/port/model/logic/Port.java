@@ -37,8 +37,8 @@ public class Port {
                 return false;
             }
             currentContainers += count;
-            PortLogger.log("Loaded in storage " + count + " containers. " +
-                    "Current containers: " + currentContainers);
+            PortLogger.log("Loaded in storage " + count + " containers. "
+                    + "Current containers: " + currentContainers);
             return true;
         } finally {
             containerLock.unlock();

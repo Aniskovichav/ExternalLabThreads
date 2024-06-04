@@ -20,25 +20,34 @@ public class Ship implements Runnable {
 
     @Override
     public void run() {
-        PortLogger.log("Ship " + id + " started with " + containerCount + " containers.");
+        PortLogger.log("Ship " + id + " started with " + containerCount
+                + " containers.");
         while (true) { //
-            int remainingSpaceStoragePort = port.getCapacityStorage() - port.getCurrentContainerCount();
+            int remainingSpaceStoragePort = port.getCapacityStorage()
+                    - port.getCurrentContainerCount();
             int dockIndex = port.requestDock();
             if (dockIndex >= 0 && remainingSpaceStoragePort > 0) {
                 try {
-                    PortLogger.log("Ship " + id + " docked at dock " + dockIndex + " with " + containerCount + " containers");
+                    PortLogger.log("Ship " + id + " docked at dock " + dockIndex
+                            + " with " + containerCount + " containers");
                     if (containerCount > 0) {
-                        int containersToUnload = Math.min(containerCount, remainingSpaceStoragePort);
+                        int containersToUnload = Math.min(containerCount,
+                                remainingSpaceStoragePort);
                         port.loadContainerInStorage(containersToUnload);
-                        PortLogger.log("Ship " + id + " unloaded " + containersToUnload + " containers.");
+                        PortLogger.log("Ship " + id + " unloaded "
+                                + containersToUnload + " containers.");
                         containerCount -= containersToUnload;
-                        PortLogger.log("Ship " + id + " with " + containerCount + " containers.");
+                        PortLogger.log("Ship " + id + " with " + containerCount
+                                + " containers.");
                     } else if (containerCount == 0) {
-                        int containersToLoad = Math.min(capacity, port.getCapacityStorage());
+                        int containersToLoad = Math.min(capacity,
+                                port.getCapacityStorage());
                         port.unloadContainerFromStorage(containersToLoad);
-                        PortLogger.log("Ship " + id + " loaded " + containersToLoad + " containers.");
+                        PortLogger.log("Ship " + id + " loaded "
+                                + containersToLoad + " containers.");
                         containerCount += containersToLoad;
-                        PortLogger.log("Ship " + id + " with " + containerCount + " containers.");
+                        PortLogger.log("Ship " + id + " with " + containerCount
+                                + " containers.");
                     }
                     try {
                         TimeUnit.MILLISECONDS.sleep(100);
@@ -60,15 +69,21 @@ public class Ship implements Runnable {
     private void exchangeContainerWithAnotherShip() {
         Ship[] ships = getOtherShips();
         for (Ship other : ships) {
-            if (other != this && other.id != this.id && port.getLock().tryLock()) {
+            if (other != this && other.id != this.id
+                    && port.getLock().tryLock()) {
                 try {
                     if (this.containerCount > 0 && other.containerCount == 0) {
                         other.containerCount += this.containerCount;
-                        PortLogger.log("Ship " + this.id + " exchanged " + this.containerCount + " containers with ship " + other.id + ".");
+                        PortLogger.log("Ship " + this.id + " exchanged "
+                                + this.containerCount + " containers with ship "
+                                + other.id + ".");
                         this.containerCount = 0;
-                    } else if (this.containerCount == 0 && other.containerCount > 0) {
+                    } else if (this.containerCount == 0
+                            && other.containerCount > 0) {
                         this.containerCount += other.containerCount;
-                        PortLogger.log("Ship " + this.id + " exchanged " + other.containerCount + " containers with ship " + other.id + ".");
+                        PortLogger.log("Ship " + this.id + " exchanged "
+                                + other.containerCount + " containers with ship "
+                                + other.id + ".");
                         other.containerCount = 0;
                     }
                 } finally {

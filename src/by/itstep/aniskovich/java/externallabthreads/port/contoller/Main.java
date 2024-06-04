@@ -10,7 +10,8 @@ public class Main {
         Port port = new Port(100,2);
 
         for (int i = 1; i <= 200; i++) {
-            new Ship(i, port, ShipInit.randomShipCapacity(), ShipInit.randomShipContainer());
+            new Ship(i, port, ShipInit.randomShipCapacity(),
+                    ShipInit.randomShipContainer());
         }
 
         PortLogger.log("All ships have completed their operations.");
