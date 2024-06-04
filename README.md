@@ -49,7 +49,7 @@ This project simulates a port where ships dock to load and unload containers. Th
 
 ## UML Diagram
 
-![UML Diagram](D:\16%20Анискович\Java\ExternalLabThreads.png "Seaport")
+![UML Diagram](https://github.com/Aniskovichav/ExternalLabThreads/blob/master/ExternalLabThreads.png "Seaport")
 
 ## Log4j Configuration
 The logging configuration is specified in the `log4j.properties` file. Logs are output to a file named `test.log`.
